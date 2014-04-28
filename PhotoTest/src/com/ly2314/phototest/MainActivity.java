@@ -2,7 +2,9 @@ package com.ly2314.phototest;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 
 public class MainActivity extends Activity {
 
@@ -20,4 +22,15 @@ public class MainActivity extends Activity {
         return true;
     }
     
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+    	int id = item.getItemId();
+    	if (id == R.id.action_photo)
+    	{
+    		Log.d("debug", "action photo");
+    		return true;
+    	}
+    	return super.onOptionsItemSelected(item);
+    }
 }
