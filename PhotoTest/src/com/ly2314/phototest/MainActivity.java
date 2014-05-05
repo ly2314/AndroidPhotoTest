@@ -4,12 +4,15 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 public class MainActivity extends Activity {
 
+	private static final int REQUEST_CODE_PHOTO = 2314;
+	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,9 +36,33 @@ public class MainActivity extends Activity {
     		Log.d("debug", "action photo");
     		Intent intent = new Intent();
     		intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
-    		startActivity(intent);
+    		//startActivity(intent);
+    		
+    		startActivityForResult(intent, REQUEST_CODE_PHOTO);
     		return true;
     	}
     	return super.onOptionsItemSelected(item);
+    }
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent)
+    {
+    	super.onActivityResult(requestCode, resultCode, intent);
+    	if (requestCode == REQUEST_CODE_PHOTO)
+    	{
+    		if (resultCode == RESULT_OK)
+    		{
+    			Bitmap bitmap = intent.getParcelableExtra("data");
+    			
+    		}
+    		else if (resultCode == RESULT_CANCELED)
+    		{
+    			
+    		}
+    		else
+    		{
+    			
+    		}
+    	}
     }
 }
