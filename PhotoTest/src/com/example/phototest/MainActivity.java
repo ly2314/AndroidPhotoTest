@@ -1,6 +1,7 @@
 package com.example.phototest;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.ParseException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -24,6 +26,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.os.Build;
 import android.provider.MediaStore;
+
+import com.parse.Parse;
+import com.parse.ParseFile;
+import com.parse.SaveCallback;
 
 @SuppressLint("ValidFragment")
 public class MainActivity extends ActionBarActivity {
@@ -51,6 +57,7 @@ public class MainActivity extends ActionBarActivity {
 
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
+		Parse.initialize(this, "UL5aUW60NIRAoOzKCK0Oe9ddu8jRrkQKZ61WJT2l", "P5e07cjyEJJAXdvcpfK0nuSsO7DPy5f2ISoXXlgx");
 		return true;
 	}
 
@@ -88,7 +95,7 @@ public class MainActivity extends ActionBarActivity {
 				//_imageView.setImageBitmap(bitmap);
 				//save(bitmap);
 				_textView.setText(outputFileUri.getPath());
-				
+				saveToParse();
 				Log.d("debug", "OK");
 			}
 			else if (resultCode == RESULT_CANCELED) 
@@ -100,6 +107,47 @@ public class MainActivity extends ActionBarActivity {
 				
 			}
 		}
+	}
+	
+	private void saveToParse()
+	{
+		File file = getTargetFile();
+		byte[] data = new byte[(int) file.length()];
+		
+		try
+		{
+			FileInputStream fis = new FileInputStream(file);
+			fis.read(data);
+			
+			int offset = 0;
+			int numRead = 0;
+			
+			while ((numRead = fis.read(data, offset, data.length - offset)) != -1)
+			{
+				offset += numRead;
+			}
+			
+			fis.close();
+		}
+		catch (FileNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		
+		final ParseFile parseFile = new ParseFile("photo.png", data);
+		parseFile.saveInBackground(new SaveCallback()
+		{
+
+			@Override
+			public void done(com.parse.ParseException arg0)
+			{
+				Log.d("debug", parseFile.getUrl());				
+			}
+		});
 	}
 	
 	private void save(Bitmap bitmap)
