@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -31,6 +32,8 @@ public class MainActivity extends ActionBarActivity {
 	
 	private ImageView _imageView;
 	private TextView _textView;
+	
+	private Uri outputFileUri;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -57,10 +60,13 @@ public class MainActivity extends ActionBarActivity {
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-		if (id == R.id.action_photo) {
+		if (id == R.id.action_photo)
+		{
 			Log.d("debug", "action photo");
+			outputFileUri = Uri.fromFile(getTargetFile());
 			Intent intent = new Intent();
 			intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
+			intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
 			startActivityForResult(intent, REQUEST_CODE_PHOTO);
 
 			return true;
@@ -78,9 +84,11 @@ public class MainActivity extends ActionBarActivity {
 		{
 			if (resultCode == RESULT_OK)
 			{
-				Bitmap bitmap = intent.getParcelableExtra("data");
-				_imageView.setImageBitmap(bitmap);
-				save(bitmap);
+				//Bitmap bitmap = intent.getParcelableExtra("data");
+				//_imageView.setImageBitmap(bitmap);
+				//save(bitmap);
+				_textView.setText(outputFileUri.getPath());
+				
 				Log.d("debug", "OK");
 			}
 			else if (resultCode == RESULT_CANCELED) 
@@ -95,14 +103,8 @@ public class MainActivity extends ActionBarActivity {
 	}
 	
 	private void save(Bitmap bitmap)
-	{
-		File imageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-		if (imageDir.exists() == false)
-		{
-			imageDir.mkdirs();
-		}
-		
-		File imageFile = new File(imageDir, "photo.png");
+	{		
+		File imageFile = getTargetFile();
 		try
 		{
 			FileOutputStream fos = new FileOutputStream(imageFile);
@@ -122,6 +124,17 @@ public class MainActivity extends ActionBarActivity {
 		_textView.setText(imageFile.getPath());
 	}
 
+	private File getTargetFile()
+	{
+		File imageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+		if (imageDir.exists() == false)
+		{
+			imageDir.mkdirs();
+		}
+		
+		return new File(imageDir, "photo.png");
+	}
+	
 	/**
 	 * A placeholder fragment containing a simple view.
 	 */
